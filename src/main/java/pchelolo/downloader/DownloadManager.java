@@ -1,31 +1,30 @@
 package pchelolo.downloader;
 
-import pchelolo.downloader.request.DownloadRequest;
+import pchelolo.downloader.HttpDownloadTask;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class DownloadManager {
-
     private final ExecutorService controller = Executors.newCachedThreadPool();
 
     public DownloadResponse download(DownloadRequest request) {
-        return new DownloadResponse(controller.submit(new DownloadTask(request)));
+        DownloadResponse response = new DownloadResponse(request, this);
+        resumeDownload(request, response);
+        return response;
     }
 
-    private class DownloadTask implements Callable<byte[]> {
+    void resumeDownload(DownloadRequest request, DownloadResponse response) {
+        controller.execute(createDownloadTask(request, response));
+    }
 
-        private final DownloadRequest request;
-
-        private DownloadTask(DownloadRequest request) {
-            this.request = request;
-        }
-
-        @Override
-        public byte[] call() throws Exception {
-            return new byte[1];
+    private Runnable createDownloadTask(DownloadRequest request, DownloadResponse response) {
+        String protocol = request.getUrl().getProtocol().toLowerCase();
+        switch (protocol) {
+            case "http":
+                return new HttpDownloadTask(request, response);
+            default:
+                throw new UnsupportedOperationException("Protocol " + protocol + " is not supported");
         }
     }
 }
