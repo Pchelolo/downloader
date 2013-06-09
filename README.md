@@ -1,4 +1,4 @@
 downloader
 ==========
 
-An asynchonous content downoader
+An asynchronous content downoader
