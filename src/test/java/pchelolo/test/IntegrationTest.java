@@ -8,8 +8,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import pchelolo.downloader.DownloadManager;
-import pchelolo.downloader.DownloadRequest;
 import pchelolo.downloader.DownloadResponse;
+import pchelolo.downloader.impl.DefaultDownloadManager;
+import pchelolo.downloader.DownloadRequest;
+import pchelolo.downloader.impl.DownloadResponseImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -60,7 +62,7 @@ public class IntegrationTest {
      */
     @Test
     public void simpleDownloadTest() throws Exception {
-        DownloadManager manager = new DownloadManager();
+        DownloadManager manager = DownloadManager.Factory.createDefaultDownloadManager();
         DownloadRequest request = new DownloadRequest.Builder("http://localhost:" + SERVER_PORT).build();
         DownloadResponse result = manager.download(request);
         Assert.assertNotNull("DownloadResult is null", result);
@@ -71,15 +73,16 @@ public class IntegrationTest {
 
     @Test
     public void pauseResumeDownloadTest() throws Exception {
-        DownloadManager manager = new DownloadManager();
+        DownloadManager manager = DownloadManager.Factory.createDefaultDownloadManager();
         DownloadRequest request = new DownloadRequest.Builder("http://localhost:" + SERVER_PORT).build();
         DownloadResponse result = manager.download(request);
         Assert.assertNotNull("DownloadResult is null", result);
 
         int waitCount = 0;
-        while (result.getStatus() == DownloadResponse.Status.NOT_STARTED) {
+        while (result.getStatus() == DownloadResponseImpl.Status.NOT_STARTED) {
             Thread.sleep(10);
-            if (++waitCount > 20) {
+            waitCount++;
+            if (waitCount > 20) {
                 throw new RuntimeException("Failed. Test does no start");
             }
         }
@@ -93,13 +96,17 @@ public class IntegrationTest {
 
     @Test
     public void pauseResumeWigglingTest() throws Exception {
-        DownloadManager manager = new DownloadManager();
+        DownloadManager manager = DownloadManager.Factory.createDefaultDownloadManager();
         DownloadRequest request = new DownloadRequest.Builder("http://localhost:" + SERVER_PORT).build();
         DownloadResponse result = manager.download(request);
         Assert.assertNotNull("DownloadResult is null", result);
 
-        while (result.getStatus() != DownloadResponse.Status.FINISHED) {
-            result.pause();
+        while (result.getStatus() != DownloadResponseImpl.Status.FINISHED) {
+            try {
+                result.pause();
+            } catch (IllegalStateException e) {
+                //IGNORE... already finished probably
+            }
             try {
                 result.resume();
             } catch (IllegalStateException e) {

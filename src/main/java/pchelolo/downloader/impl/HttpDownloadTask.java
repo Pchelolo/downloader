@@ -1,12 +1,14 @@
-package pchelolo.downloader;
+package pchelolo.downloader.impl;
+
+import pchelolo.downloader.DownloadRequest;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URLConnection;
 
-class HttpDownloadTask extends DownloadTask {
+public class HttpDownloadTask extends DownloadTask {
 
-    public HttpDownloadTask(DownloadRequest request, DownloadResponse response) {
+    public HttpDownloadTask(DownloadRequest request, DownloadResponseImpl response) {
         super(request, response);
     }
 

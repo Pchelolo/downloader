@@ -1,4 +1,6 @@
-package pchelolo.downloader;
+package pchelolo.downloader.impl;
+
+import pchelolo.downloader.DownloadRequest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,9 +17,9 @@ abstract class DownloadTask implements Runnable {
     private static final int INITIAL_OUTPUT_SIZE = 16384;
 
     final DownloadRequest request;
-    private final DownloadResponse response;
+    private final DownloadResponseImpl response;
 
-    DownloadTask(DownloadRequest request, DownloadResponse response) {
+    DownloadTask(DownloadRequest request, DownloadResponseImpl response) {
         this.request = request;
         this.response = response;
     }
@@ -32,7 +34,7 @@ abstract class DownloadTask implements Runnable {
             conn = prepareConnection();
             prepareStream(conn);
 
-            response.setStatus(DownloadResponse.Status.IN_PROGRESS);
+            response.setStatus(DownloadResponseImpl.Status.IN_PROGRESS);
 
             try (InputStream inputStream = conn.getInputStream()) {
                 byte[] tmpBuf = new byte[TMP_BUF_SIZE];
@@ -40,7 +42,7 @@ abstract class DownloadTask implements Runnable {
                 while (!Thread.currentThread().isInterrupted()) {
                     int len = inputStream.read(tmpBuf);
                     if (len == -1) {
-                        response.setStatus(DownloadResponse.Status.FINISHED);
+                        response.setStatus(DownloadResponseImpl.Status.FINISHED);
                         break;
                     }
                     response.getStream().write(tmpBuf, 0, len);
@@ -50,7 +52,7 @@ abstract class DownloadTask implements Runnable {
                         return;
                     }
 
-                    if (response.getStatus() == DownloadResponse.Status.CANCELLED) {
+                    if (response.getStatus() == DownloadResponseImpl.Status.CANCELLED) {
                         //Clean up already downloaded memory
                         response.setStream(null);
                         return;
@@ -58,7 +60,7 @@ abstract class DownloadTask implements Runnable {
                 }
             }
         } catch (IOException | InterruptedException e) {
-            response.setStatus(DownloadResponse.Status.FAILED);
+            response.setStatus(DownloadResponseImpl.Status.FAILED);
         } finally {
             finalizeConnection(conn);
         }
@@ -66,10 +68,10 @@ abstract class DownloadTask implements Runnable {
 
     /**
      * Prepares an output stream to start or resume a download and sets in to the
-     * {@link DownloadResponse}.
+     * {@link DownloadResponseImpl}.
      * Checks and saves if the server and a protocol supports resuming downloads.
      *
-     * @throws RuntimeException if the {@link DownloadResponse} already has some output,
+     * @throws RuntimeException if the {@link DownloadResponseImpl} already has some output,
      *                          but the server does not support resuming connections
      */
     private void prepareStream(URLConnection conn) {
