@@ -1,11 +1,10 @@
 package pchelolo.downloader;
 
-import pchelolo.downloader.impl.DownloadResponseImpl;
-
 import java.util.concurrent.TimeUnit;
 
 /**
- * The class representing a DownloadResponseImpl. Used to get downloaded bytes and to control the download process.
+ * The class representing a DownloadResponse.
+ * Used to get downloaded bytes and to control the download process.
  */
 public interface DownloadResponse {
 
@@ -46,9 +45,9 @@ public interface DownloadResponse {
     }
 
     /**
-     * Returns the {@link pchelolo.downloader.impl.DownloadResponseImpl.Status} of the current download process
+     * Returns the {@link DownloadResponse.Status} of the current download process
      */
-    DownloadResponseImpl.Status getStatus();
+    Status getStatus();
 
     /**
      * Wait for a result to be ready and return it
@@ -63,7 +62,7 @@ public interface DownloadResponse {
     /**
      * Timed wait for the result to be ready
      * <p/>
-     * See: {@link pchelolo.downloader.impl.DownloadResponseImpl#getResult()}
+     * See: {@link DownloadResponse#getResult()}
      *
      * @return a download result if it was finished
      *         all byte, downloaded before the failure if the download fails

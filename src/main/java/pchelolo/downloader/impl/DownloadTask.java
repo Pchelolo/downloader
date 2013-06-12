@@ -68,10 +68,11 @@ abstract class DownloadTask implements Runnable {
 
     /**
      * Prepares an output stream to start or resume a download and sets in to the
-     * {@link DownloadResponseImpl}.
+     * {@link pchelolo.downloader.DownloadResponse}.
      * Checks and saves if the server and a protocol supports resuming downloads.
      *
-     * @throws RuntimeException if the {@link DownloadResponseImpl} already has some output,
+     * @throws RuntimeException if the {@link pchelolo.downloader.DownloadResponse}
+     *                          already has some output,
      *                          but the server does not support resuming connections
      */
     private void prepareStream(URLConnection conn) {

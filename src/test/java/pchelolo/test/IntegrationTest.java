@@ -8,10 +8,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import pchelolo.downloader.DownloadManager;
-import pchelolo.downloader.DownloadResponse;
-import pchelolo.downloader.impl.DefaultDownloadManager;
 import pchelolo.downloader.DownloadRequest;
-import pchelolo.downloader.impl.DownloadResponseImpl;
+import pchelolo.downloader.DownloadResponse;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -79,7 +77,7 @@ public class IntegrationTest {
         Assert.assertNotNull("DownloadResult is null", result);
 
         int waitCount = 0;
-        while (result.getStatus() == DownloadResponseImpl.Status.NOT_STARTED) {
+        while (result.getStatus() == DownloadResponse.Status.NOT_STARTED) {
             Thread.sleep(10);
             waitCount++;
             if (waitCount > 20) {
@@ -101,7 +99,7 @@ public class IntegrationTest {
         DownloadResponse result = manager.download(request);
         Assert.assertNotNull("DownloadResult is null", result);
 
-        while (result.getStatus() != DownloadResponseImpl.Status.FINISHED) {
+        while (result.getStatus() != DownloadResponse.Status.FINISHED) {
             try {
                 result.pause();
             } catch (IllegalStateException e) {
